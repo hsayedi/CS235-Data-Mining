@@ -133,13 +133,13 @@ def plot_histories(histories, number_of_neurons, feature_name, save=False):
 
 
 def gen_graphs(file, target='neighbourhood_group', output_dim=5, epochs=100, list_of_neurons=[8, 16, 32], loss_func='sparse_categorical_crossentropy',
-               optimizer_param='adam', output_activation='softmax', save=False):
+               optimizer_param='adam', output_activation='softmax', save=False, verbose=1):
     
     X_train, X_test, y_train, y_test = process_data(target=target)
 
     for i in list_of_neurons:
         models, histories = test_models(X_train, X_test, y_train, y_test, output_dim, epochs=epochs, neurons=i, loss_func=loss_func, optimizer_param=optimizer_param,
-                    output_activation=output_activation)
+                    output_activation=output_activation, verbose=verbose)
 
         plot_histories(histories, i, "Price", save=save)
 
