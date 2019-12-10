@@ -15,79 +15,79 @@ The PlotElbow() function can help to determine an optimal number for K.
 
 def KMeansAlgorithm(df, num_iter, K):
 		
-		# imports
-		import numpy as np
-		import pandas as pd
-		import random as rd
-		import seaborn as sns
-		from matplotlib import pyplot as plt
+	# imports
+	import numpy as np
+	import pandas as pd
+	import random as rd
+	import seaborn as sns
+	from matplotlib import pyplot as plt
 
-		data = df.values 
-		m = data.shape[0] # num training examples
-		n = data.shape[1] # num of features
-		
-		def InitCentroidsRandom():
-				# Centroids will be a (n x K) dimensional matrix. Each column will be one centroid for one cluster
-				centroids = np.array([]).reshape(n, 0)
-				for i in range(K): 
-						rand = rd.randint(0, m-1)
-						centroids = np.c_[centroids,data[rand]]
-				return centroids # the KMeansAlgorithm() function will return centroids.T
-		
-		# Initiate centroids randomly 
-		centroids = InitCentroidsRandom()
-		result = {}
-		
-		# Begin iterations to update centroids, compute and update Euclidean distances
-		for i in range(num_iter):
-				 # First compute the Euclidean distances and store them in array
-					EucDist = np.array([]).reshape(m, 0)
-					for k in range(K):
-							dist = np.sum((data - centroids[:,k])**2, axis=1)
-							EucDist = np.c_[EucDist, dist]
-					# take the min distance 
-					min_dist = np.argmin(EucDist, axis=1) + 1 
-						
-				 # Begin iterations
-					soln_temp = {} # temp dict which stores solution for one iteration - Y
-						
-					for k in range(K):
-							soln_temp[k+1] = np.array([]).reshape(n, 0)
-					 
-					for i in range(m):
-							# regroup the data points based on the cluster index 
-							soln_temp[min_dist[i]] = np.c_[soln_temp[min_dist[i]], data[i]]
-					
-					for k in range(K):
-							soln_temp[k+1] = soln_temp[k+1].T
-					# Updating centroids as the new mean for each cluster
-					for k in range(K):
-							centroids[:,k] = np.mean(soln_temp[k+1], axis=0)
-					result = soln_temp
-				
-		def PlotClusters(result, centroids, K):
-				# create arrays for colors and labels based on specified K
-				colors = ["#"+''.join([rd.choice('0123456789ABCDEF') for j in range(6)])
-						 for i in range(K)]
-				labels = ['cluster_' + str(i+1) for i in range(K)]
-				
-				fig1 = plt.figure(figsize=(5,5))
-				ax1 = plt.subplot(111)
-				# plot each cluster
-				for k in range(K):
-						ax1.scatter(result[k+1][:,0], result[k+1][:,1], 
-												c = colors[k], label = labels[k])
-				# plot centroids
-				ax1.scatter(centroids[0,:],centroids[1,:], #alpha=.5,
-										s = 300, c = 'lime', label = 'centroids')
-				plt.xlabel(df.columns[0]) # first column of df
-				plt.ylabel(df.columns[1]) # second column of df
-				plt.legend()
-				plt.show(block=True)
+	data = df.values 
+	m = data.shape[0] # num training examples
+	n = data.shape[1] # num of features
 
-				return 
-						
-		return result, centroids.T, PlotClusters(result, centroids, K)
+	def InitCentroidsRandom():
+		# Centroids will be a (n x K) dimensional matrix. Each column will be one centroid for one cluster
+		centroids = np.array([]).reshape(n, 0)
+		for i in range(K): 
+				rand = rd.randint(0, m-1)
+				centroids = np.c_[centroids,data[rand]]
+		return centroids # the KMeansAlgorithm() function will return centroids.T
+
+	# Initiate centroids randomly 
+	centroids = InitCentroidsRandom()
+	result = {}
+
+	# Begin iterations to update centroids, compute and update Euclidean distances
+	for i in range(num_iter):
+		 # First compute the Euclidean distances and store them in array
+			EucDist = np.array([]).reshape(m, 0)
+			for k in range(K):
+					dist = np.sum((data - centroids[:,k])**2, axis=1)
+					EucDist = np.c_[EucDist, dist]
+			# take the min distance 
+			min_dist = np.argmin(EucDist, axis=1) + 1 
+				
+		 # Begin iterations
+			soln_temp = {} # temp dict which stores solution for one iteration - Y
+				
+			for k in range(K):
+					soln_temp[k+1] = np.array([]).reshape(n, 0)
+			 
+			for i in range(m):
+					# regroup the data points based on the cluster index 
+					soln_temp[min_dist[i]] = np.c_[soln_temp[min_dist[i]], data[i]]
+			
+			for k in range(K):
+					soln_temp[k+1] = soln_temp[k+1].T
+			# Updating centroids as the new mean for each cluster
+			for k in range(K):
+					centroids[:,k] = np.mean(soln_temp[k+1], axis=0)
+			result = soln_temp
+		
+	def PlotClusters(result, centroids, K):
+		# create arrays for colors and labels based on specified K
+		colors = ["#"+''.join([rd.choice('0123456789ABCDEF') for j in range(6)])
+				 for i in range(K)]
+		labels = ['cluster_' + str(i+1) for i in range(K)]
+		
+		fig1 = plt.figure(figsize=(5,5))
+		ax1 = plt.subplot(111)
+		# plot each cluster
+		for k in range(K):
+				ax1.scatter(result[k+1][:,0], result[k+1][:,1], 
+										c = colors[k], label = labels[k])
+		# plot centroids
+		ax1.scatter(centroids[0,:],centroids[1,:], #alpha=.5,
+								s = 300, c = 'lime', label = 'centroids')
+		plt.xlabel(df.columns[0]) # first column of df
+		plt.ylabel(df.columns[1]) # second column of df
+		plt.legend()
+		plt.show(block=True)
+
+		return 
+				
+	return result, centroids.T, PlotClusters(result, centroids, K)
 
 '''
 Elbow Method:
