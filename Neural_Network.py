@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# ## Implementation - Kevin Vega
+
 import collections
 import numpy as np
 import pandas as pd
@@ -11,7 +16,10 @@ from keras.models import Sequential
 
 from sklearn.preprocessing import LabelEncoder
 
-def process_data(file="new-york-city-airbnb-open-data/AB_NYC_2019.csv",
+# ## Neural Network
+
+
+def process_data(file="data/new-york-city-airbnb-open-data/AB_NYC_2019.csv",
                  target='neighbourhood_group', test_size=0.2):
     df = pd.read_csv(str(file))
     
@@ -55,6 +63,9 @@ def process_data(file="new-york-city-airbnb-open-data/AB_NYC_2019.csv",
     return X_train, X_test, y_train, y_test
 
 
+# In[137]:
+
+
 def create_model(feature_dim, output_dim, neurons, hidden_layers=1, activation='relu', loss_func='sparse_categorical_crossentropy', optimizer_param='adam',
                 output_activation='softmax'):
     model = Sequential()
@@ -92,3 +103,46 @@ def test_models(X_train, X_test, y_train, y_test, output_dim, n_models=4, neuron
         print("")
     
     return models, histories
+
+
+def plot_histories(histories, number_of_neurons, feature_name, save=False):
+    
+    if type(feature_name) != str:
+        print("Please enter desired feature name as string")
+        return
+    
+    for i in range(len(histories)):
+        plt.plot(histories[i].history['acc'], label="{}-Hidden Layers".format(i+1))
+    plt.title('{} - Model Accuracy, {} neurons per layer'.format(feature_name, number_of_neurons))
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend()
+    if save:
+        plt.savefig("{}-{}-hidden-{}-neurons-acc.png".format(feature_name, i+1, number_of_neurons))
+    plt.show()
+    
+    for i in range(len(histories)):
+        plt.plot(histories[i].history['loss'], label="{}-Hidden Layers".format(i+1))
+    plt.title('{} - Model Loss, {} neurons per layer'.format(feature_name, number_of_neurons))
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend()
+    if save:
+        plt.savefig("{}-{}-hidden-{}-neurons-loss.png".format(feature_name, i+1, number_of_neurons))
+    plt.show()
+
+
+def gen_graphs(file, target='neighbourhood_group', output_dim=5, epochs=100, list_of_neurons=[8, 16, 32], loss_func='sparse_categorical_crossentropy',
+               optimizer_param='adam', output_activation='softmax', save=False):
+    
+    X_train, X_test, y_train, y_test = process_data(target=target)
+
+    for i in list_of_neurons:
+        models, histories = test_models(X_train, X_test, y_train, y_test, output_dim, epochs=epochs, neurons=i, loss_func=loss_func, optimizer_param=optimizer_param,
+                    output_activation=output_activation)
+
+        plot_histories(histories, i, "Price", save=save)
+
+
+
+
